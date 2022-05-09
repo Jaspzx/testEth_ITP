@@ -9,7 +9,7 @@ contract TodoList {
         bool completed;
     }
 
-    // 
+    // Need a form of loop to call out all the tasks.
     mapping(uint => Task) public tasks;
 
     // Function that is called whenever the smart contract is run for the first time (Deployment).
