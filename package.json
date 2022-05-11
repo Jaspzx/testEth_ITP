@@ -23,6 +23,6 @@
         "truffle-contract": "^4.0.2"
     },
     "dependencies": {
-        "web3": "^0.20.7"
+        "web3": "^0.20.6"
     }
 }

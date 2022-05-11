@@ -4,67 +4,93 @@ App = {
         // console.log("app loading....")
         await App.loadWeb3()
         await App.loadAccount()
-        await App.loadContract()
-        await App.render()
-        // web3.eth.defaultAccount = App.account;
+        // await App.loadContract()
+        // await App.render()
     },
 
     // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
+    // loadWeb3: async () => {
+    //     // Web3 = require('web3')
+    //     if (typeof web3 !== 'undefined') {
+    //         App.web3Provider = web3.currentProvider
+    //         web3 = new Web3(web3.currentProvider)
+    //         // web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:7545"))
+    //     } else {
+    //         window.alert("Please connect to Metamask.")
+    //     }
+    //     // Modern dapp browsers...
+    //     if (window.ethereum) {
+    //         window.web3 = new Web3(ethereum)
+    //         try {
+    //             // Request account access if needed
+    //             await ethereum.enable()
+    //             // Acccounts now exposed
+    //             web3.eth.sendTransaction({/* ... */ })
+    //         } catch (error) {
+    //             // User denied account access...
+    //         }
+    //     }
+    //     // Legacy dapp browsers...
+    //     else if (window.web3) {
+    //         App.web3Provider = web3.currentProvider
+    //         window.web3 = new Web3(web3.currentProvider)
+    //         // Acccounts always exposed
+    //         web3.eth.sendTransaction({/* ... */ })
+    //     }
+    //     // Non-dapp browsers...
+    //     else {
+    //         console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    //     }
+    // },
+
+    // =================================== TEST CODE ====================================================
     loadWeb3: async () => {
-        // Web3 = require('web3')
-        if (typeof web3 !== 'undefined') {
-            App.web3Provider = web3.currentProvider
-            web3 = new Web3(web3.currentProvider)
-        } else {
-            window.alert("Please connect to Metamask.")
-        }
         // Modern dapp browsers...
         if (window.ethereum) {
-            window.web3 = new Web3(ethereum)
+            window.web3 = new Web3(ethereum);
             try {
                 // Request account access if needed
-                await ethereum.enable()
+                await ethereum.enable();
                 // Acccounts now exposed
-                web3.eth.sendTransaction({/* ... */ })
+                //web3.eth.sendTransaction({/* ... */});
             } catch (error) {
                 // User denied account access...
             }
         }
         // Legacy dapp browsers...
         else if (window.web3) {
-            App.web3Provider = web3.currentProvider
-            window.web3 = new Web3(web3.currentProvider)
+            window.web3 = new Web3(web3.currentProvider);
             // Acccounts always exposed
-            web3.eth.sendTransaction({/* ... */ })
+            //web3.eth.sendTransaction({/* ... */});
         }
         // Non-dapp browsers...
         else {
-            console.log('Non-Ethereum browser detected. You should consider trying MetaMask!')
+            console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
         }
+        console.log("done loading web3");
     },
+    // =================================== END END END ====================================================
 
     loadAccount: async () => {
         // Set the current blockchain account
         // App.account = web3.eth.accounts[0]
         App.account = web3.eth.defaultAccount;
+        // App.account = web3.eth.account;
         console.log(App.account);
-
-        // web3.eth.defaultAccount = web3.eth.accounts[0];
-        // console.log(web3.eth.defaultAccount);
     },
 
-    loadContract: async () => {
-        // Create a JavaScript version of the smart contract
-        const todoList = await $.getJSON('TodoList.json')
-        App.contracts.TodoList = TruffleContract(todoList)
-        App.contracts.TodoList.setProvider(App.web3Provider)
-        //   const todoList = await $.getJSON('TodoList.json')
+    // loadContract: async () => {
+    //     // Create a JavaScript version of the smart contract
+    //     const todoList = await $.getJSON('TodoList.json')
+    //     App.contracts.TodoList = TruffleContract(todoList)
+    //     App.contracts.TodoList.setProvider(App.web3Provider)
+    //     //   const todoList = await $.getJSON('TodoList.json')
 
-        // Hydrate the smart contract with values from the blockchain
-        App.todoList = await App.contracts.TodoList.deployed()
+    //     // Hydrate the smart contract with values from the blockchain
+    //     App.todoList = await App.contracts.TodoList.deployed()
 
-        console.log(todoList)
-    },
+    //     console.log(todoList)
+    // },
 
     render: async () => {
         // Prevent double render
@@ -84,7 +110,7 @@ App = {
         // Update loading state
         App.setLoading(false)
     },
-    
+
     renderTasks: async () => {
         // Load the total task count from the blockchain
         const taskCount = await App.todoList.taskCount()
@@ -121,14 +147,22 @@ App = {
     createTask: async () => {
         App.setLoading(true)
         const content = $('#newTask').val()
-        await App.todoList.createTask(content)
+        // await App.todoList.createTask(content)
+        await App.todoList.createTask(content, { from: App.account })
         window.location.reload()
     },
+
+    // toggleCompleted: async (e) => {
+    //     App.setLoading(true)
+    //     const taskId = e.target.name
+    //     await App.todoList.toggleCompleted(taskId)
+    //     window.location.reload()
+    // },
 
     toggleCompleted: async (e) => {
         App.setLoading(true)
         const taskId = e.target.name
-        await App.todoList.toggleCompleted(taskId)
+        await App.todoList.toggleCompleted(taskId, { from: App.account })
         window.location.reload()
     },
 
@@ -145,7 +179,6 @@ App = {
         }
     }
 }
-
 
 $(() => {
     $(window).load(() => {
